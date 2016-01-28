@@ -62,5 +62,15 @@ function yolo() {
   });
 }
 
+function inject(file, injection) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, 'utf8', (err, contents) => {
+      if(err) reject(new Error(err.message));
+      resolve(contents);
+    });
+  });
+}
+
 // TODO
+// - improve file validation (fs.access)
 // - allow overwriting
