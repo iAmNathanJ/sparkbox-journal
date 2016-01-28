@@ -41,4 +41,6 @@ validateSrc(file)
   console.log(err);
 });
 
-// clean up draft
+// TODO
+// - allow overwriting
+// - clean up old draft file
