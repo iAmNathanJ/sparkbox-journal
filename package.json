@@ -15,5 +15,6 @@
   "bugs": {
     "url": "https://github.com/iAmNathanJ/sparkbox-journal/issues"
   },
-  "homepage": "https://github.com/iAmNathanJ/sparkbox-journal#readme"
+  "homepage": "https://github.com/iAmNathanJ/sparkbox-journal#readme",
+  "dependencies": {}
 }
