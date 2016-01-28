@@ -2,6 +2,7 @@
 
 let fs    = require('fs')
   , path  = require('path')
+  , spawn = require('child_process').spawn
   , read  = fs.createReadStream
   , write = fs.createWriteStream;
 
@@ -9,6 +10,29 @@ let file      = process.argv[2]
   , filename  = path.basename(file)
   , dest      = `./entries/${filename}`;
 
+
+validateSrc(file)
+.then((src) => {
+  return validateDest(src, dest);
+})
+.then((msg) => {
+  // Status message
+  console.log(msg);
+  // Copy the file
+  let fileStream = read(file)
+  .pipe(write(dest))
+  .finish(() => {
+    yolo();
+  });
+
+  // fileStream.on('finish', () => {
+  //   // Push to github
+  //   yolo();
+  // });
+})
+.catch((err) => {
+  console.log(err);
+});
 
 function validateSrc(fSrc) {
   return new Promise((resolve, reject) => {
@@ -28,19 +52,16 @@ function validateDest(fSrc, fDest) {
   });
 }
 
-validateSrc(file)
-.then((src) => {
-  return validateDest(src, dest);
-})
-.then((msg) => {
-  console.log(msg);
-  read(file)
-  .pipe(write(dest));
-})
-.catch((err) => {
-  console.log(err);
-});
+function yolo() {
+  let add = spawn('git', ['add', dest]);
+  let commit = spawn('git', ['commit', '-m', `add ${filename}`]);
+  let push = spawn('git', ['push']);
+  [add, commit, push].forEach((cmd) => {
+    cmd.stdout.on('data', (data) => {
+      console.log(`${data}`);
+    });
+  });
+}
 
 // TODO
 // - allow overwriting
-// - clean up old draft file
