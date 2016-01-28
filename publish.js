@@ -16,19 +16,18 @@ validateSrc(file)
   return validateDest(src, dest);
 })
 .then((msg) => {
+
   // Status message
   console.log(msg);
+
   // Copy the file
   let fileStream = read(file)
-  .pipe(write(dest))
-  .finish(() => {
+  .pipe(write(dest));
+
+  // Push to github
+  fileStream.on('finish', () => {
     yolo();
   });
-
-  // fileStream.on('finish', () => {
-  //   // Push to github
-  //   yolo();
-  // });
 })
 .catch((err) => {
   console.log(err);
