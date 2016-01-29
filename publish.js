@@ -66,7 +66,9 @@ function inject(file, injection) {
   return new Promise((resolve, reject) => {
     fs.readFile(file, 'utf8', (err, contents) => {
       if(err) reject(new Error(err.message));
-      resolve(contents);
+      let opening = '<!-- inject -->', closing = '<-- /inject -->';
+      // let injectionSite = new RegExp(/^(opening)/ + /asd/ + /(closing)$/);
+      resolve(contents.replace(/^(<!-- inject -->)[\w\W]*(<-- \/inject -->)$/ig, `${opening}\nHELLO\n\n${closing}));
     });
   });
 }
@@ -74,3 +76,4 @@ function inject(file, injection) {
 // TODO
 // - improve file validation (fs.access)
 // - allow overwriting
+// - add injection functionality
