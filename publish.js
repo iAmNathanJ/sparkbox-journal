@@ -10,6 +10,7 @@ let file      = process.argv[2]
   , filename  = path.basename(file)
   , dest      = `./entries/${filename}`;
 
+const esc = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 
 validateSrc(file)
 .then((src) => {
