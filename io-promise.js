@@ -56,11 +56,27 @@ module.exports = {
   return Promise => String
   ==========================================
   */
-  promiseRead(file) {
+  readFile(file) {
     return new Promise((resolve, reject) => {
-      fs.readFile(file, 'utf8', (err, contents) => {
+      fs.readFile(file, 'utf8', (err, data) => {
         if(err) reject(new Error(err.message));
-        resolve(contents);
+        resolve(data);
+      });
+    });
+  },
+
+
+  /*
+  ==========================================
+  Write File async
+  return Promise => true
+  ==========================================
+  */
+  writeFile(file, data) {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(file, data, (err) => {
+        if(err) reject(new Error(err.message));
+        resolve(true);
       });
     });
   }
