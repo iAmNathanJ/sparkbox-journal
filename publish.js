@@ -1,32 +1,57 @@
 'use strict';
 
-let fs    = require('fs')
-  , path  = require('path')
-  , spawn = require('child_process').spawn
-  , read  = fs.createReadStream
-  , write = fs.createWriteStream;
+const fs = require('fs')
+    , path = require('path')
+    , spawn = require('child_process').spawn
+    , read = fs.createReadStream
+    , write = fs.createWriteStream
+    , iop = require('./io-promise.js');
 
-let file      = process.argv[2]
-  , filename  = path.basename(file)
-  , dest      = `./entries/${filename}`;
 
-const esc = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+/*
+==========================================
+File to publish
+==========================================
+*/
+const file = process.argv[2]
+    , filename = path.basename(file)
+    , dest = `./entries/${filename}`;
 
-validateSrc(file)
+
+/*
+==========================================
+Regex helpers
+==========================================
+*/
+const esc = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    , opening = '<!-- inject -->'
+    , closing = '<!-- /inject -->'
+    , injectionSite = new RegExp(esc(opening) + '(.|\n)*' + esc(closing), 'g');
+
+
+/*
+==========================================
+Do work
+==========================================
+*/
+// 1. Confirm the source file exists
+iop.validateSrc(file)
 .then((src) => {
-  return validateDest(src, dest);
+
+  // 2. Confirm the destination file doesn't exist
+  // Don't overwrite
+  return iop.validateDest(src, dest);
 })
 .then((msg) => {
 
-  // Status message
+  // 3. Send a status message
   console.log(msg);
 
-  // Copy the file
-  let fileStream = read(file)
-  .pipe(write(dest));
+  // 4. Copy the source file to the destination
+  let copyFile = read(file).pipe(write(dest));
 
-  // Push to github
-  fileStream.on('finish', () => {
+  // 5. Once the stream is closed, push it up
+  copyFile.on('finish', () => {
     yolo();
   });
 })
@@ -34,24 +59,30 @@ validateSrc(file)
   console.log(err);
 });
 
-function validateSrc(fSrc) {
+
+/*
+==========================================
+Inject async
+return Promise => injected String
+==========================================
+*/
+function inject(stringToInject, injection) {
   return new Promise((resolve, reject) => {
-    fs.stat(fSrc, (err, stats) => {
-      if(err) reject(new Error(`Source file doesn't exist: ${fSrc}`));
-      resolve(fSrc);
-    });
+    if(stringToInject.match(injectionSite)) {
+      let newString = stringToInject.replace(injectionSite, `${opening}\n${injection}\n\n${closing}`);
+      resolve(newString);
+    } else {
+      reject(new Errror('No injection site found in file.'));
+    }
   });
 }
 
-function validateDest(fSrc, fDest) {
-  return new Promise((resolve, reject) => {
-    fs.stat(fDest, (err, stats) => {
-      if(err) resolve(`Copying ${fSrc} => ${fDest}`);
-      reject(new Error(`File already exists: ${fDest}`));
-    });
-  });
-}
 
+/*
+==========================================
+Push to Github
+==========================================
+*/
 function yolo() {
   let add = spawn('git', ['add', dest]);
   let commit = spawn('git', ['commit', '-m', `add ${filename}`]);
@@ -59,17 +90,6 @@ function yolo() {
   [add, commit, push].forEach((cmd) => {
     cmd.stdout.on('data', (data) => {
       console.log(`${data}`);
-    });
-  });
-}
-
-function inject(file, injection) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(file, 'utf8', (err, contents) => {
-      if(err) reject(new Error(err.message));
-      let opening = '<!-- inject -->', closing = '<-- /inject -->';
-      // let injectionSite = new RegExp(/^(opening)/ + /asd/ + /(closing)$/);
-      resolve(contents.replace(/^(<!-- inject -->)[\w\W]*(<-- \/inject -->)$/ig, `${opening}\nHELLO\n\n${closing}));
     });
   });
 }
