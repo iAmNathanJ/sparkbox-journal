@@ -50,14 +50,66 @@ io.validateSrc(file)
   // 4. Copy the source file to the destination
   let copyFile = read(file).pipe(write(dest));
 
-  // 5. Once the stream is closed, push it up
+  // 5. Once the stream is closed, build README
   copyFile.on('finish', () => {
-    yolo();
+
+    // 6. Build README
+    buildReadme();
   });
 })
 .catch((err) => {
   console.log(err);
 });
+
+
+function buildReadme() {
+
+  // 1. Read in README file
+  let injectionFile = io.readFile('./README.md');
+
+  // 2. Read entry dir and send through formatting
+  // This will create the content to inject
+  let injection = io.readDir('./entries').then((list) => format(list));
+
+  // 3. Resolve steps 1 & 2
+  Promise.all([injectionFile, injection])
+  .then((data) => {
+
+    // 4. Create the injected content
+    return inject(data[0], data[1]);
+  })
+  .then((injectedFile) => {
+
+    // 5. Write the injected README
+    return io.writeFile('./README.md', injectedFile);
+  })
+  .then(() => {
+
+    // Push it to Github
+    yolo();
+  });
+}
+
+
+/*
+==========================================
+Format Sync
+return String
+==========================================
+*/
+// Helpers
+let leadingZero = (num) => num < 10 ? '0' + String(num) : num;
+let basename = (file) => file.split('').slice(0, -3).join('');
+function format(arrayOfFiles) {
+  let entryNum
+    , fileName;
+
+  return arrayOfFiles.reduce((list, file, i) => {
+    entryNum = leadingZero(i+1);
+    fileName = basename(file);
+    return list += `- [**e_${entryNum}** ${fileName}](./entries/${file})\n`;
+  }, '');
+}
 
 
 /*
@@ -69,7 +121,7 @@ return Promise => injected String
 function inject(stringToInject, injection) {
   return new Promise((resolve, reject) => {
     if(stringToInject.match(injectionSite)) {
-      let newString = stringToInject.replace(injectionSite, `${opening}\n${injection}\n\n${closing}`);
+      let newString = stringToInject.replace(injectionSite, `${opening}\n${injection}\n${closing}`);
       resolve(newString);
     } else {
       reject(new Errror('No injection site found in file.'));
