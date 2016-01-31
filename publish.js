@@ -5,7 +5,7 @@ const fs = require('fs')
     , spawn = require('child_process').spawn
     , read = fs.createReadStream
     , write = fs.createWriteStream
-    , iop = require('./io-promise.js');
+    , io = require('./io-promise.js');
 
 
 /*
@@ -35,12 +35,12 @@ Do work
 ==========================================
 */
 // 1. Confirm the source file exists
-iop.validateSrc(file)
+io.validateSrc(file)
 .then((src) => {
 
   // 2. Confirm the destination file doesn't exist
   // Don't overwrite
-  return iop.validateDest(src, dest);
+  return io.validateDest(src, dest);
 })
 .then((msg) => {
 
