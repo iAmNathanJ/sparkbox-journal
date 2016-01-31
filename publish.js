@@ -135,8 +135,8 @@ Push to Github
 ==========================================
 */
 function yolo() {
-  let add = spawn('git', ['add', dest]);
-  let commit = spawn('git', ['commit', '-m', `add ${filename}`]);
+  let add = spawn('git', ['add', dest + ' README.md']);
+  let commit = spawn('git', ['commit', '-m', `add ${filename} and update README`]);
   let push = spawn('git', ['push']);
   [add, commit, push].forEach((cmd) => {
     cmd.stdout.on('data', (data) => {
