@@ -57,9 +57,7 @@ io.validateSrc(file)
     buildReadme();
   });
 })
-.catch((err) => {
-  console.log(err);
-});
+.catch((err) => console.error(err));
 
 
 function buildReadme() {
@@ -87,7 +85,8 @@ function buildReadme() {
 
     // Push it to Github
     yolo();
-  });
+  })
+  .catch((err) => console.error(err));
 }
 
 
