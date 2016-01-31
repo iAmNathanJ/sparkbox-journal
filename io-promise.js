@@ -69,16 +69,16 @@ module.exports = {
   /*
   ==========================================
   Write File async
-  return Promise => true
+  return Promise => written data
   ==========================================
   */
   writeFile(file, data) {
-    // return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       fs.writeFile(file, data, (err) => {
         if(err) reject(new Error(err.message));
-        // resolve(data);
+        resolve(data);
       });
-    // });
+    });
   }
 
 };
