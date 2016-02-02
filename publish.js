@@ -15,7 +15,7 @@ File to publish
 */
 const file = process.argv[2]
     , filename = path.basename(file)
-    , dest = `./entries/${filename}`;
+    , destination = `./entries/${filename}`;
 
 
 /*
@@ -34,21 +34,22 @@ const esc = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
 Do work
 ==========================================
 */
-// 1. Confirm the source file exists
-io.validateSrc(file)
-.then((src) => {
 
-  // 2. Confirm the destination file doesn't exist
-  // Don't overwrite
-  return io.validateDest(src, dest);
-})
-.then((msg) => {
+// 1. Confirm the source file exists
+let src = io.validateSrc(file);
+
+// 2. Confirm the destination file doesn't exist
+// Don't overwrite
+let dest = io.validateDest(destination);
+
+Promise.all([src, dest])
+.then((paths) => {
 
   // 3. Send a status message
-  console.log(msg);
+  console.log(`Copying ${paths[0]} => ${paths[1]}`);
 
   // 4. Copy the source file to the destination
-  let copyFile = read(file).pipe(write(dest));
+  let copyFile = read(file).pipe(write(destination));
 
   // 5. Once the stream is closed, build README
   copyFile.on('finish', () => {
@@ -135,7 +136,7 @@ Push to Github
 ==========================================
 */
 function yolo() {
-  let add = spawn('git', ['add', dest, 'README.md']);
+  let add = spawn('git', ['add', destination, 'README.md']);
   let commit = spawn('git', ['commit', '-m', `add ${filename} and update README`]);
   let push = spawn('git', ['push']);
   [add, commit, push].forEach((cmd) => {

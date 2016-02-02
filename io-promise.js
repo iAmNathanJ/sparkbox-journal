@@ -24,10 +24,10 @@ module.exports = {
   return Promise => file path
   ==========================================
   */
-  validateDest(fSrc, fDest) {
+  validateDest(fDest) {
     return new Promise((resolve, reject) => {
       fs.stat(fDest, (err, stats) => {
-        if(err) resolve(`Copying ${fSrc} => ${fDest}`);
+        if(err) resolve(fDest);
         reject(new Error(`File already exists: ${fDest}`));
       });
     });
