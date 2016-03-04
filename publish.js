@@ -107,7 +107,7 @@ function format(arrayOfFiles) {
   return arrayOfFiles.reduce((list, file, i) => {
     entryNum = leadingZero(i+1);
     fileName = basename(file);
-    return list += `- [**e_${entryNum}** ${fileName}](./entries/${file})\n`;
+    return list += `- [**${entryNum}** ${fileName}](./entries/${file})\n`;
   }, '');
 }
 
