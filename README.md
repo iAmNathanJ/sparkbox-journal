@@ -13,5 +13,6 @@ On January 12, 2016 I began a web development apprenticeship with [Sparkbox](htt
 - [**09** 2016-03-04](./entries/2016-03-04.md)
 - [**10** 2016-03-18](./entries/2016-03-18.md)
 - [**11** 2016-04-07](./entries/2016-04-07.md)
+- [**12** 2016-04-15](./entries/2016-04-15.md)
 
 <!-- /inject -->
